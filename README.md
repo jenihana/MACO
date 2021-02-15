@@ -125,7 +125,7 @@ Before start loading data you need to select which type of environment you're us
 - Select [US-Government](https://docs.microsoft.com/en-us/azure/azure-government/documentation-government-developer-guide) for Azure Us government services. Azure Government is a separate instance of the Microsoft Azure service. It addresses the security and compliance needs of United States federal agencies, state and local governments, and their solution providers.
 - **Preview feature:** Select [China](https://docs.microsoft.com/en-us/azure/china/resources-developer-guide) to load data from cloud applications in Microsoft Azure operated by 21Vianet (Azure China).
 
-![selector](/images/input.png)
+![selector](/images/inputs.png)
 
 ## Log Analytics Workspace ID
 
