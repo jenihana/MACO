@@ -165,7 +165,7 @@ If the permissions and credentials are properly flushed it should ask you for cr
 
 - Click on **Refresh**.
   
-![credentials3](/images/Credentials3.png)
+![credentials3](/images/refresh.png)
 
 ### Credentials for <span>management.azure.com</span> REST API request:
 
