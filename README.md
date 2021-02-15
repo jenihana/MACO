@@ -16,7 +16,8 @@ Below you can find the list of providers and the actions that you will need to p
 
 | Resource Provider Name| Permissions |
 | --- | --- |
-|Azure Advisor| Microsoft.Advisor/generateRecommendations/action <br> 
+|Azure Advisor| Microsoft.Advisor/generateRecommendations/action |
+|Log Analytics| Microsoft.OperationalInsights/workspaces/"workspaceName"/users
 |*|*/Read|
 
 ## APIs in use
@@ -67,14 +68,14 @@ Registering these 3 Resource Providers has no cost or performance penalty on the
 5. Click on **Microsoft.Resourcehealth** and **Register**.
 6. Click on **Microsoft.Security** and **Register**.
 
-![resource providers](/install/images/resourceproviders.png)
+![resource providers](/images/resourceproviders.png)
 
 ## Azure Advisor Recommendations
 Azure Advisor is a personalized cloud consultant that helps you follow best practices to optimize your Azure deployments. It analyzes your resource configuration and usage telemetry. It then recommends solutions to help improve the performance, security, and high availability of your resources while looking for opportunities to reduce your overall Azure spend.
 
 The MACO Power BI Dashboard will directly pull data from Azure Advisor REST APIs to aggregate all the information across the Azure account subscriptions. This requires generating the recommendations before the first time we load the template else the Dashboard will be empty or will fail because it was unable to download any data.
 
-To do so, you need to generate the recommendations for the first time manually from the Azure Portal, or programmatically using the script [GenerateAllSubscriptionsAdvisorRecommendations.ps1](/install/scripts/GenerateAllSubsAdvisorRecommendations.ps1)
+To do so, you need to generate the recommendations for the first time manually from the Azure Portal, or programmatically using the script [GenerateAllSubscriptionsAdvisorRecommendations.ps1](/scripts/GenerateAllSubsAdvisorRecommendations.ps1)
 
 ### Generating Azure Advisor recommendations manually
 
@@ -86,7 +87,7 @@ Open the Azure Portal with your Azure Account http://portal.azure.com
 4.	Wait until the recommendations for the selected subscriptions has been loaded.
 5.	Repeat these steps for each subscription you want to generate Azure Advisor recommendations.
 
-![AdvisorRecommendations](/install/images/AdvisorRecommendations.png)
+![AdvisorRecommendations](/images/AdvisorRecommendations.png)
 
 ## Azure Security Center Recommendations
 
@@ -108,7 +109,7 @@ The following picture shows the steps to configure Azure Security Center plan fo
 3.	Click on **Select the subscription you want to configure**.
 4.	Click on **Free** or **Standard** plan and the click **Save**.
 
-![SecurityCenterStandardRecommendations](/install/images/EnableSecurityCenterStandard.png)
+![SecurityCenterStandardRecommendations](/images/EnableSecurityCenterStandard.png)
 
 # Setting up the Managed Azure Cost Optimization Power BI Dashboard
 
@@ -124,7 +125,7 @@ Before start loading data you need to select which type of environment you're us
 - Select [US-Government](https://docs.microsoft.com/en-us/azure/azure-government/documentation-government-developer-guide) for Azure Us government services. Azure Government is a separate instance of the Microsoft Azure service. It addresses the security and compliance needs of United States federal agencies, state and local governments, and their solution providers.
 - **Preview feature:** Select [China](https://docs.microsoft.com/en-us/azure/china/resources-developer-guide) to load data from cloud applications in Microsoft Azure operated by 21Vianet (Azure China).
 
-![selector](/install/images/selector.png)
+![selector](/images/selector.png)
 
 ## Log Analytics Workspace ID
 
@@ -156,7 +157,7 @@ In some cases, old credentials are cached by previous logins using Power BI Desk
 - Click on **Clear Permissions**.
 - Click on **Clear All Permissions**.
 
-![credentials1](/install/images/Credentials1.png) ![credentials2](/install/images/Credentials2.png)
+![credentials1](/images/Credentials1.png) ![credentials2](/images/Credentials2.png)
 
 ### Refresh the dashboard
 
@@ -164,7 +165,7 @@ If the permissions and credentials are properly flushed it should ask you for cr
 
 - Click on **Refresh**.
   
-![credentials3](/install/images/Credentials3.png)
+![credentials3](/images/Credentials3.png)
 
 ### Credentials for <span>management.azure.com</span> REST API request:
 
@@ -173,7 +174,7 @@ If the permissions and credentials are properly flushed it should ask you for cr
 - Click on **Connect**.
 
 
-![credentials4](/install/images/Credentials4.png)
+![credentials4](/images/Credentials4.png)
 
 ### Credentials for <span>api.loganalytics.io</span> API
 
@@ -181,14 +182,14 @@ If the permissions and credentials are properly flushed it should ask you for cr
 - Click on **Sign in**.
 - Click on **Connect**.
 
-![loganalytics](/install/images/loganalyticsAPI.PNG)
+![loganalytics](/images/loganalyticsAPI.PNG)
 
 ### Enter Access Web content credentials
 
 - Make sure that you select **Organization account** type.
 - Click on **Sign in**.
   
-![credentials7](/install/images/Credentials7.png)
+![credentials7](/images/Credentials7.png)
 
 
 
@@ -198,7 +199,7 @@ If the permissions and credentials are properly flushed it should ask you for cr
 
 In this page, you will be able to identify the previous month total Azure spend as well as the projected monthly and annual savings the report has generated. You can then see monthly cost breakdowns by environment, subscription, and service types. Finally you will be bale to see the top 10 Azure Advisor cost recommendations and the potential annual savings.
 
-![overview](/install/images/OverviewImage.png)
+![overview](/images/OverviewImage.png)
 
 ## Azure Compute Overview page
 
@@ -215,7 +216,7 @@ Data Inputs
 - https://docs.microsoft.com/en-us/rest/api/compute
 - http://azure.microsoft.com/api/v2/pricing/virtual-machines-base/calculator/
 
-![azurecompute](/install/images/AzureCompute.png)
+![azurecompute](/images/AzureCompute.png)
 
 ## Azure Virtual Machine Rightsizing page
 
@@ -237,7 +238,7 @@ Data Inputs
 Data Outputs
 - Virtual Machine Rightsizing Table
 
-![azurecompute](/install/images/AzureCompute.png)
+![azurecompute](/images/AzureCompute.png)
 
 ## Azure Advisor Recommendations page
 
@@ -256,7 +257,7 @@ If you navigate to a impacted resource you will see a quick description, potenti
 Data Inputs:
 - https://docs.microsoft.com/en-us/rest/api/advisor/
 
-![advisor](/install/images/Advisor.png)
+![advisor](/images/Advisor.png)
 
 ## Azure Security Center Alerts page
 
@@ -272,7 +273,7 @@ You can filter the information by:
 Data Inputs:
 https://msdn.microsoft.com/en/US/library/mt704034(Azure.100).aspx
 
-![security Center alerts](/install/images/SecurityCenterAlerts.png)
+![security Center alerts](/images/SecurityCenterAlerts.png)
 
 ## IaaS Usage and Limits page
 
@@ -286,7 +287,7 @@ You can filter the information by:
 Data Inputs
 - https://docs.microsoft.com/en-us/rest/api/compute
 
-![azure Idle](/install/images/UsageAndLimits.png)
+![azure Idle](/images/UsageAndLimits.png)
 
 ## IaaS Idle Resources Dashboard page
 
@@ -303,7 +304,7 @@ Data Inputs
 - https://docs.microsoft.com/en-us/rest/api/virtual-network
 - - https://docs.microsoft.com/en-us/rest/api/virtualnetwork/networkinterfaces
 
-![azure Idle](/install/images/IdleResources.png)
+![azure Idle](/images/IdleResources.png)
 
 ## Azure Kubernetes Service Dashboard Overview page
 
@@ -314,7 +315,7 @@ You can filter the information by:
 - Subscription
 - AKS Cluster
 
-![aks](/install/images/aks.PNG)
+![aks](/images/aks.PNG)
 
 **IMPORTANT**: to receive all the information related to the Pods, Containers and Container Images a log analytics workspace configured **is required**.
 </div>
@@ -333,4 +334,4 @@ You can filter the information by:
 **IMPORTANT**: to receive all the information related to the Pods, Containers and Container Images a log analytics workspace configured **is required**.
 </div>
 
-![aks](/install/images/aks2.png)
+![aks](/images/aks2.png)
