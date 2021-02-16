@@ -1,0 +1,412 @@
+// NICs
+
+let ListAllNICs= (SubscriptionId as text) =>
+let
+ GetPages = (Path)=>
+ let
+     Source = Json.Document(Web.Contents(Path)),
+     LL= @Source[value],
+     result = try @LL & @GetPages(Source[#"nextLink"]) otherwise @LL
+ in
+ result,
+    Fullset = GetPages(GetManagementURL(AzureKind)&"/subscriptions/"&SubscriptionId&"/providers/Microsoft.Network/networkInterfaces?api-version=2018-11-01"),
+    #"Converted to Table" = Table.FromList(Fullset, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+    #"Expanded Column1" = Table.ExpandRecordColumn(#"Converted to Table", "Column1", {"name", "id", "location", "properties"}, {"name", "id", "location", "properties"}),
+    #"Renamed Columns" = Table.RenameColumns(#"Expanded Column1",{{"name", "NIC Name"}, {"id", "NIC Id"}}),
+    #"Expanded properties" = Table.ExpandRecordColumn(#"Renamed Columns", "properties", {"ipConfigurations", "dnsSettings", "enableAcceleratedNetworking", "enableIPForwarding", "primary", "virtualMachine", "hostedWorkloads", "tapConfigurations", "macAddress", "networkSecurityGroup"}, {"ipConfigurations", "dnsSettings", "enableAcceleratedNetworking", "enableIPForwarding", "primary", "virtualMachine", "hostedWorkloads", "tapConfigurations", "macAddress", "networkSecurityGroup"}),
+    #"Expanded ipConfigurations2" = Table.ExpandListColumn(#"Expanded properties", "ipConfigurations"),
+    #"Expanded ipConfigurations3" = Table.ExpandRecordColumn(#"Expanded ipConfigurations2", "ipConfigurations", {"name", "id", "properties"}, {"name", "id", "properties"}),
+    #"Expanded properties2" = Table.ExpandRecordColumn(#"Expanded ipConfigurations3", "properties", {"privateIPAddress", "privateIPAllocationMethod", "subnet", "primary", "privateIPAddressVersion", "loadBalancerBackendAddressPools", "publicIPAddress"}, {"privateIPAddress", "privateIPAllocationMethod", "subnet", "primary.1", "privateIPAddressVersion", "loadBalancerBackendAddressPools", "publicIPAddress"}),
+    #"Expanded subnet" = Table.ExpandRecordColumn(#"Expanded properties2", "subnet", {"id"}, {"id.1"}),
+    #"Expanded loadBalancerBackendAddressPools" = Table.ExpandListColumn(#"Expanded subnet", "loadBalancerBackendAddressPools"),
+    #"Expanded loadBalancerBackendAddressPools1" = Table.ExpandRecordColumn(#"Expanded loadBalancerBackendAddressPools", "loadBalancerBackendAddressPools", {"id"}, {"id.2"}),
+    #"Expanded publicIPAddress" = Table.ExpandRecordColumn(#"Expanded loadBalancerBackendAddressPools1", "publicIPAddress", {"id"}, {"id.3"}),
+    #"Expanded dnsSettings" = Table.ExpandRecordColumn(#"Expanded publicIPAddress", "dnsSettings", {"dnsServers", "appliedDnsServers", "internalDomainNameSuffix"}, {"dnsServers", "appliedDnsServers", "internalDomainNameSuffix"}),
+    #"Expanded dnsServers" = Table.ExpandListColumn(#"Expanded dnsSettings", "dnsServers"),
+    #"Expanded appliedDnsServers" = Table.ExpandListColumn(#"Expanded dnsServers", "appliedDnsServers"),
+    #"Expanded virtualMachine" = Table.ExpandRecordColumn(#"Expanded appliedDnsServers", "virtualMachine", {"id"}, {"id.4"}),
+    #"Expanded hostedWorkloads" = Table.ExpandListColumn(#"Expanded virtualMachine", "hostedWorkloads"),
+    #"Expanded tapConfigurations" = Table.ExpandListColumn(#"Expanded hostedWorkloads", "tapConfigurations"),
+    #"Expanded networkSecurityGroup" = Table.ExpandRecordColumn(#"Expanded tapConfigurations", "networkSecurityGroup", {"id"}, {"id.5"}),
+    #"Renamed Columns1" = Table.RenameColumns(#"Expanded networkSecurityGroup",{{"name", "IPConfig Name"}, {"id", "IPConfig Id"}, {"id.1", "Subnet Id"}, {"primary.1", "Primary IP"}, {"privateIPAddressVersion", "IP Version"}, {"id.2", "BackendAddressPool Id"}, {"id.3", "Public IP Id"}, {"id.4", "Virtual Machine Id"}, {"id.5", "NSG Id"}}),
+    #"Duplicated Column" = Table.DuplicateColumn(#"Renamed Columns1", "Subnet Id", "Subnet Id - Copy"),
+    #"Split Column by Delimiter" = Table.SplitColumn(#"Duplicated Column", "Subnet Id - Copy", Splitter.SplitTextByEachDelimiter({"/"}, QuoteStyle.Csv, true), {"Subnet Id - Copy.1", "Subnet Id - Copy.2"}),
+    #"Changed Type" = Table.TransformColumnTypes(#"Split Column by Delimiter",{{"Subnet Id - Copy.1", type text}, {"Subnet Id - Copy.2", type text}}),
+    #"Renamed Columns2" = Table.RenameColumns(#"Changed Type",{{"Subnet Id - Copy.2", "Subnet Name"}}),
+    #"Split Column by Delimiter1" = Table.SplitColumn(#"Renamed Columns2", "Subnet Id - Copy.1", Splitter.SplitTextByEachDelimiter({"/"}, QuoteStyle.Csv, true), {"Subnet Id - Copy.1.1", "Subnet Id - Copy.1.2"}),
+    #"Changed Type1" = Table.TransformColumnTypes(#"Split Column by Delimiter1",{{"Subnet Id - Copy.1.1", type text}, {"Subnet Id - Copy.1.2", type text}}),
+    #"Renamed Columns3" = Table.RenameColumns(#"Changed Type1",{{"Subnet Id - Copy.1.1", "VNET Id"}}),
+    #"Removed Columns" = Table.RemoveColumns(#"Renamed Columns3",{"Subnet Id - Copy.1.2"}),
+    #"Split Column by Delimiter2" = Table.SplitColumn(#"Removed Columns", "VNET Id", Splitter.SplitTextByEachDelimiter({"/"}, QuoteStyle.Csv, true), {"VNET Id.1", "VNET Id.2"}),
+    #"Changed Type2" = Table.TransformColumnTypes(#"Split Column by Delimiter2",{{"VNET Id.1", type text}, {"VNET Id.2", type text}}),
+    #"Renamed Columns4" = Table.RenameColumns(#"Changed Type2",{{"VNET Id.2", "VNET Name"}, {"VNET Id.1", "VNET Id"}}),
+    #"Removed Columns1" = Table.RemoveColumns(#"Renamed Columns4",{"VNET Id"})
+in
+    #"Removed Columns1"
+in
+    ListAllNICs
+
+
+// Resource Groups
+
+let ListResourceGroups= (SubscriptionId as text) =>
+let
+ GetPages = (Path)=>
+ let
+     Source = Json.Document(Web.Contents(Path)),
+     LL= @Source[value],
+     result = try @LL & @GetPages(Source[#"nextLink"]) otherwise @LL
+ in
+ result,
+    Fullset = GetPages(GetManagementURL(AzureKind)&"/subscriptions/"&SubscriptionId&"/resourcegroups?api-version=2019-05-01"),
+    #"Converted to Table" = Table.FromList(Fullset, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+    #"Expanded Column1" = Table.ExpandRecordColumn(#"Converted to Table", "Column1", {"id", "name", "type", "location", "tags"}, {"id", "name", "type", "location", "tags"}),
+    #"Renamed Columns" = Table.RenameColumns(#"Expanded Column1",{{"id", "Resource Group Id"}, {"name", "Resource Group Name"}}),
+   #"Added Conditional Column" = Table.AddColumn(#"Renamed Columns", "IsTagged", each if [tags] = null  then "Untagged" else if [tags] = [] then "Untagged" else "Tagged"),
+    #"Removed Columns" = Table.RemoveColumns(#"Added Conditional Column",{"tags"})
+in
+    #"Removed Columns"
+
+in
+    ListResourceGroups
+
+
+// All Resources
+
+let ListResources= (SubscriptionId as text) =>
+let
+ GetPages = (Path)=>
+ let
+     Source = Json.Document(Web.Contents(Path)),
+     LL= @Source[value],
+     result = try @LL & @GetPages(Source[#"nextLink"]) otherwise @LL
+ in
+ result,
+    Fullset = GetPages(GetManagementURL(AzureKind)&"/subscriptions/"&SubscriptionId&"/resources?api-version=2019-05-01"),
+    #"Converted to Table" = Table.FromList(Fullset, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+
+    #"Expanded Column2" = Table.ExpandRecordColumn(#"Converted to Table", "Column1", {"id", "name", "type", "location", "tags"}, {"id", "name", "type", "location", "tags"}),
+ 
+    #"Added Conditional Column" = Table.AddColumn(#"Expanded Column2", "IsTagged", each if [tags] = null then "Untagged" else if [tags] = [] then "Untagged" else "Tagged"),
+   
+    #"Removed Columns1" = Table.RemoveColumns(#"Added Conditional Column",{"tags"}),
+    #"Renamed Columns" = Table.RenameColumns(#"Removed Columns1",{{"id", "Resource Id"}, {"name", "Resource Name"}, {"type", "Resource Type"}}),
+    #"Duplicated Column" = Table.DuplicateColumn(#"Renamed Columns", "Resource Id", "Resource Id - Copy"),
+    #"Split Column by Delimiter" = Table.SplitColumn(#"Duplicated Column", "Resource Id - Copy", Splitter.SplitTextByDelimiter("/providers", QuoteStyle.Csv), {"Resource Id - Copy.1", "Resource Id - Copy.2"}),
+    #"Changed Type" = Table.TransformColumnTypes(#"Split Column by Delimiter",{{"Resource Id - Copy.1", type text}, {"Resource Id - Copy.2", type text}}),
+    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"Resource Id - Copy.2"}),
+    #"Renamed Columns1" = Table.RenameColumns(#"Removed Columns",{{"Resource Id - Copy.1", "Resource Group Id"}}),
+    #"Duplicated Column1" = Table.DuplicateColumn(#"Renamed Columns1", "Resource Group Id", "Resource Group Id - Copy"),
+    #"Split Column by Delimiter1" = Table.SplitColumn(#"Duplicated Column1", "Resource Group Id - Copy", Splitter.SplitTextByEachDelimiter({"/"}, QuoteStyle.Csv, true), {"Resource Group Id - Copy.1", "Resource Group Id - Copy.2"}),
+    #"Changed Type1" = Table.TransformColumnTypes(#"Split Column by Delimiter1",{{"Resource Group Id - Copy.1", type text}, {"Resource Group Id - Copy.2", type text}}),
+    #"Renamed Columns2" = Table.RenameColumns(#"Changed Type1",{{"Resource Group Id - Copy.2", "Resource Group Name"}}),
+    #"Removed Columns2" = Table.RemoveColumns(#"Renamed Columns2",{"Resource Group Id - Copy.1"})
+in
+    #"Removed Columns2"
+in
+    ListResources
+
+// Public IPs
+
+let ListPublicIPs = (SubscriptionId as text) =>
+let
+ GetPages = (Path)=>
+ let
+     Source = Json.Document(Web.Contents(Path)),
+     LL= @Source[value],
+     result = try @LL & @GetPages(Source[#"nextLink"]) otherwise @LL
+ in
+ result,
+    Fullset = GetPages(GetManagementURL(AzureKind)&"/subscriptions/"&SubscriptionId&"/providers/Microsoft.Network/publicIPAddresses?api-version=2017-10-01"),
+    #"Converted to Table" = Table.FromList(Fullset, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+    #"Expanded Column1" = Table.ExpandRecordColumn(#"Converted to Table", "Column1", {"name", "id", "location", "properties", "type", "sku", "tags"}, {"name", "id", "location", "properties", "type", "sku", "tags"}),
+    #"Renamed Columns" = Table.RenameColumns(#"Expanded Column1",{{"name", "Public IP Name"}, {"id", "Public IP Resource Id"}}),
+    #"Expanded properties" = Table.ExpandRecordColumn(#"Renamed Columns", "properties", {"provisioningState", "resourceGuid", "ipAddress", "publicIPAddressVersion", "publicIPAllocationMethod", "idleTimeoutInMinutes", "dnsSettings", "ipTags", "ipConfiguration"}, {"provisioningState", "resourceGuid", "ipAddress", "publicIPAddressVersion", "publicIPAllocationMethod", "idleTimeoutInMinutes", "dnsSettings", "ipTags", "ipConfiguration"}),
+    #"Expanded dnsSettings" = Table.ExpandRecordColumn(#"Expanded properties", "dnsSettings", {"domainNameLabel", "fqdn"}, {"domainNameLabel", "fqdn"}),
+    #"Expanded ipTags" = Table.ExpandListColumn(#"Expanded dnsSettings", "ipTags"),
+    #"Expanded ipConfiguration" = Table.ExpandRecordColumn(#"Expanded ipTags", "ipConfiguration", {"id"}, {"id"}),
+    #"Renamed Columns1" = Table.RenameColumns(#"Expanded ipConfiguration",{{"id", "IP Configuration Id"}}),
+    #"Expanded sku" = Table.ExpandRecordColumn(#"Renamed Columns1", "sku", {"name"}, {"name"}),
+    #"Renamed Columns2" = Table.RenameColumns(#"Expanded sku",{{"name", "sku"}}),
+    #"Removed Columns" = Table.RemoveColumns(#"Renamed Columns2",{"tags"}),
+    #"Duplicated Column" = Table.DuplicateColumn(#"Removed Columns", "Public IP Resource Id", "Public IP Resource Id - Copy"),
+    #"Split Column by Delimiter" = Table.SplitColumn(#"Duplicated Column", "Public IP Resource Id - Copy", Splitter.SplitTextByDelimiter("/providers", QuoteStyle.Csv), {"Public IP Resource Id - Copy.1", "Public IP Resource Id - Copy.2"}),
+    #"Changed Type" = Table.TransformColumnTypes(#"Split Column by Delimiter",{{"Public IP Resource Id - Copy.1", type text}, {"Public IP Resource Id - Copy.2", type text}}),
+    #"Renamed Columns3" = Table.RenameColumns(#"Changed Type",{{"Public IP Resource Id - Copy.1", "Resource Group Id"}}),
+    #"Removed Columns1" = Table.RemoveColumns(#"Renamed Columns3",{"Public IP Resource Id - Copy.2"})
+in
+    #"Removed Columns1"
+
+
+in
+    ListPublicIPs
+
+// Virtual Machines
+
+let ListVirtualMachines = (SubscriptionId as text) =>
+let
+ GetPages = (Path)=>
+ let
+     Source = Json.Document(Web.Contents(Path)),
+     LL= @Source[value],
+     result = try @LL & @GetPages(Source[#"nextLink"]) otherwise @LL
+ in
+ result,
+    Fullset = GetPages(GetManagementURL(AzureKind)&"/subscriptions/"&SubscriptionId&"/providers/Microsoft.Compute/virtualMachines?api-version=2017-12-01"),
+    #"Converted to Table" = Table.FromList(Fullset, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+    #"Expanded Column1" = Table.ExpandRecordColumn(#"Converted to Table", "Column1", {"properties", "resources", "type", "location", "tags", "id", "name"}, {"properties", "resources", "type", "location", "tags", "id", "name"}),
+    #"Renamed Columns" = Table.RenameColumns(#"Expanded Column1",{{"id", "VM Resource Id"}, {"name", "VM Name"}}),
+    #"Expanded properties" = Table.ExpandRecordColumn(#"Renamed Columns", "properties", {"vmId", "availabilitySet", "hardwareProfile", "storageProfile", "osProfile", "networkProfile", "provisioningState", "diagnosticsProfile", "licenseType"}, {"vmId", "availabilitySet", "hardwareProfile", "storageProfile", "osProfile", "networkProfile", "provisioningState", "diagnosticsProfile", "licenseType"}),
+    #"Removed Columns" = Table.RemoveColumns(#"Expanded properties",{"vmId"}),
+    #"Expanded availabilitySet" = Table.ExpandRecordColumn(#"Removed Columns", "availabilitySet", {"id"}, {"id"}),
+    #"Renamed Columns1" = Table.RenameColumns(#"Expanded availabilitySet",{{"id", "Availability Set Id"}}),
+    #"Expanded hardwareProfile" = Table.ExpandRecordColumn(#"Renamed Columns1", "hardwareProfile", {"vmSize"}, {"vmSize"}),
+    #"Expanded storageProfile" = Table.ExpandRecordColumn(#"Expanded hardwareProfile", "storageProfile", {"imageReference", "osDisk", "dataDisks"}, {"imageReference", "osDisk", "dataDisks"}),
+    #"Expanded imageReference" = Table.ExpandRecordColumn(#"Expanded storageProfile", "imageReference", {"publisher", "offer", "sku", "version"}, {"publisher", "offer", "sku", "version"}),
+    #"Expanded osDisk" = Table.ExpandRecordColumn(#"Expanded imageReference", "osDisk", {"osType", "name", "createOption", "vhd", "caching", "diskSizeGB", "managedDisk"}, {"osType", "name", "createOption", "vhd", "caching", "diskSizeGB", "managedDisk"}),
+    #"Expanded vhd" = Table.ExpandRecordColumn(#"Expanded osDisk", "vhd", {"uri"}, {"uri"}),
+    #"Renamed Columns2" = Table.RenameColumns(#"Expanded vhd",{{"uri", "vhd uri"}}),
+    #"Expanded managedDisk" = Table.ExpandRecordColumn(#"Renamed Columns2", "managedDisk", {"storageAccountType", "id"}, {"storageAccountType", "id"}),
+    #"Renamed Columns3" = Table.RenameColumns(#"Expanded managedDisk",{{"id", "Managed Disk Id"}}),
+    #"Expanded dataDisks" = Table.ExpandListColumn(#"Renamed Columns3", "dataDisks"),
+    #"Expanded dataDisks1" = Table.ExpandRecordColumn(#"Expanded dataDisks", "dataDisks", {"lun", "name", "createOption", "vhd", "caching", "diskSizeGB"}, {"lun", "name.1", "createOption.1", "vhd", "caching.1", "diskSizeGB.1"}),
+    #"Expanded vhd1" = Table.ExpandRecordColumn(#"Expanded dataDisks1", "vhd", {"uri"}, {"uri"}),
+    #"Renamed Columns4" = Table.RenameColumns(#"Expanded vhd1",{{"uri", "Data vhd uri"}}),
+    #"Expanded osProfile" = Table.ExpandRecordColumn(#"Renamed Columns4", "osProfile", {"computerName", "adminUsername", "linuxConfiguration", "secrets", "windowsConfiguration"}, {"computerName", "adminUsername", "linuxConfiguration", "secrets", "windowsConfiguration"}),
+    #"Removed Columns1" = Table.RemoveColumns(#"Expanded osProfile",{"linuxConfiguration", "secrets"}),
+    #"Expanded windowsConfiguration" = Table.ExpandRecordColumn(#"Removed Columns1", "windowsConfiguration", {"provisionVMAgent", "enableAutomaticUpdates"}, {"provisionVMAgent", "enableAutomaticUpdates"}),
+    #"Expanded networkProfile" = Table.ExpandRecordColumn(#"Expanded windowsConfiguration", "networkProfile", {"networkInterfaces"}, {"networkInterfaces"}),
+    #"Expanded networkInterfaces" = Table.ExpandListColumn(#"Expanded networkProfile", "networkInterfaces"),
+    #"Expanded networkInterfaces1" = Table.ExpandRecordColumn(#"Expanded networkInterfaces", "networkInterfaces", {"id"}, {"id"}),
+    #"Renamed Columns5" = Table.RenameColumns(#"Expanded networkInterfaces1",{{"id", "Network Inteface Id"}}),
+    #"Expanded diagnosticsProfile" = Table.ExpandRecordColumn(#"Renamed Columns5", "diagnosticsProfile", {"bootDiagnostics"}, {"bootDiagnostics"}),
+    #"Expanded bootDiagnostics" = Table.ExpandRecordColumn(#"Expanded diagnosticsProfile", "bootDiagnostics", {"enabled", "storageUri"}, {"enabled", "storageUri"}),
+    #"Expanded resources" = Table.ExpandListColumn(#"Expanded bootDiagnostics", "resources"),
+    #"Expanded resources1" = Table.ExpandRecordColumn(#"Expanded resources", "resources", {"id"}, {"id"}),
+    #"Renamed Columns6" = Table.RenameColumns(#"Expanded resources1",{{"id", "Extensions Resource Id"}}),
+    #"Expanded tags" = Table.ExpandRecordColumn(#"Renamed Columns6", "tags", {"creationSource", "orchestrator", "poolName", "resourceNameSuffix"}, {"creationSource", "orchestrator", "poolName", "resourceNameSuffix"})
+in
+    #"Expanded tags"
+
+in
+    ListVirtualMachines
+
+// Advisor Recommendations
+
+let ListRecommendations = (SubscriptionId as text) =>
+let
+ GetPages = (Path)=>
+ let
+     Source = Json.Document(Web.Contents(Path)),
+     LL= @Source[value],
+     result = try @LL & @GetPages(Source[#"nextLink"]) otherwise @LL
+ in
+ result,
+    Fullset = GetPages(GetManagementURL(AzureKind)&"/subscriptions/"&SubscriptionId&"/providers/Microsoft.Advisor/recommendations?api-version=2020-01-01"),
+    #"Converted to Table" = Table.FromList(Fullset, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+    #"Expanded Column1" = Table.ExpandRecordColumn(#"Converted to Table", "Column1", {"properties", "id"}, {"properties", "id"}),
+    #"Expanded properties" = Table.ExpandRecordColumn(#"Expanded Column1", "properties", {"category", "impact", "impactedField", "impactedValue", "lastUpdated", "recommendationTypeId", "shortDescription", "extendedProperties"}, {"category", "impact", "impactedField", "impactedValue", "lastUpdated", "recommendationTypeId", "shortDescription", "extendedProperties"}),
+    #"Expanded shortDescription" = Table.ExpandRecordColumn(#"Expanded properties", "shortDescription", {"problem", "solution"}, {"problem", "solution"}),
+    #"Expanded extendedProperties" = Table.ExpandRecordColumn(#"Expanded shortDescription", "extendedProperties", {"assessmentKey", "score", "clusterName", "region", "vmSku", "instanceCount", "savingsAmount", "annualSavingsAmount", "savingsCurrency", "recGeneratedOn", "ServerName", "DatabaseName", "IsInReplication", "ResourceGroup", "DatabaseSize", "Region", "ObservationPeriodStartDate", "ObservationPeriodEndDate", "Recommended_DTU", "Recommended_SKU", "HasRecommendation"}, {"assessmentKey", "score", "clusterName", "region.1", "vmSku", "instanceCount", "savingsAmount", "annualSavingsAmount", "savingsCurrency", "recGeneratedOn", "ServerName", "DatabaseName", "IsInReplication", "ResourceGroup", "DatabaseSize", "Region", "ObservationPeriodStartDate", "ObservationPeriodEndDate", "Recommended_DTU", "Recommended_SKU", "HasRecommendation"})
+in
+    #"Expanded extendedProperties"
+in
+    ListRecommendations
+
+// Advisor Score
+
+let ListAdvisorScore = (SubscriptionId as text) =>
+let
+ GetPages = (Path)=>
+ let
+     Source = Json.Document(Web.Contents(Path)),
+     LL= @Source[value],
+     result = try @LL & @GetPages(Source[#"nextLink"]) otherwise @LL
+ in
+ result,
+    Fullset = GetPages(GetManagementURL(AzureKind)&"/subscriptions/"&SubscriptionId&"/providers/Microsoft.Advisor/AdvisorScore?api-version=2020-07-01-preview"),
+    #"Converted to Table" = Table.FromList(Fullset, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+     #"Expanded Column1" = Table.ExpandRecordColumn(#"Converted to Table", "Column1", {"properties", "id", "name"}, {"properties", "id", "name"}),
+    #"Expanded properties" = Table.ExpandRecordColumn(#"Expanded Column1", "properties", {"lastRefreshedScore", "timeSeries"}, {"lastRefreshedScore", "timeSeries"}),
+    #"Expanded lastRefreshedScore" = Table.ExpandRecordColumn(#"Expanded properties", "lastRefreshedScore", {"date", "score", "consumptionUnits", "impactedResourceCount", "potentialScoreIncrease"}, {"date", "score", "consumptionUnits", "impactedResourceCount", "potentialScoreIncrease"}),
+    #"Expanded timeSeries" = Table.ExpandListColumn(#"Expanded lastRefreshedScore", "timeSeries"),
+    #"Expanded timeSeries1" = Table.ExpandRecordColumn(#"Expanded timeSeries", "timeSeries", {"aggregationLevel", "scoreHistory"}, {"aggregationLevel", "scoreHistory"}),
+    #"Expanded scoreHistory" = Table.ExpandListColumn(#"Expanded timeSeries1", "scoreHistory"),
+    #"Expanded scoreHistory1" = Table.ExpandRecordColumn(#"Expanded scoreHistory", "scoreHistory", {"date", "score", "consumptionUnits", "impactedResourceCount", "potentialScoreIncrease"}, {"date.1", "score.1", "consumptionUnits.1", "impactedResourceCount.1", "potentialScoreIncrease.1"}),
+    #"Changed Type" = Table.TransformColumnTypes(#"Expanded scoreHistory1",{{"date.1", type datetime}})
+in
+    #"Changed Type"
+in
+    ListAdvisorScore
+
+// Security Center Alerts
+
+let ListSecurityCenterAlerts = (subscriptionId as text) =>
+let
+    url = GetManagementURL(AzureKind)&"/subscriptions/"&subscriptionId&"/providers/microsoft.Security/alerts?api-version=2015-06-01-preview",
+    iterations = 10,
+    FuncGetOnePage = (url) as record =>
+    let 
+       Source = Json.Document(Web.Contents(url)),
+       data = try Source[value] otherwise null,
+       next = try Source[nextLink] otherwise null,
+       res = [Data=data, Next=next]
+    in
+        res,
+        GeneratedListOfPages = List.Generate(()=>[i=0, res = FuncGetOnePage(url)],
+        each [i]<iterations and [res][Data]<>null,
+        each [i=[i]+1, res = FuncGetOnePage([res][Next])],
+        each [res][Data]),
+
+    #"Converted to Table" = Table.FromList(GeneratedListOfPages, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+    #"Expanded Column1" = Table.ExpandListColumn(#"Converted to Table", "Column1"),
+    #"Expanded Column2" = Table.ExpandRecordColumn(#"Expanded Column1", "Column1", {"id", "name", "type", "properties"}, {"id", "name", "type", "properties"}),
+    #"Expanded properties" = Table.ExpandRecordColumn(#"Expanded Column2", "properties", {"vendorName", "alertDisplayName", "alertName", "detectedTimeUtc", "description", "remediationSteps", "actionTaken", "reportedSeverity", "compromisedEntity", "associatedResource", "subscriptionId", "instanceId", "extendedProperties", "state", "reportedTimeUtc", "workspaceArmId", "confidenceReasons", "canBeInvestigated", "entities"}, {"vendorName", "alertDisplayName", "alertName", "detectedTimeUtc", "description", "remediationSteps", "actionTaken", "reportedSeverity", "compromisedEntity", "associatedResource", "subscriptionId", "instanceId", "extendedProperties", "state", "reportedTimeUtc", "workspaceArmId", "confidenceReasons", "canBeInvestigated", "entities"}),
+    #"Expanded extendedProperties" = Table.ExpandRecordColumn(#"Expanded properties", "extendedProperties", {"alert Start Time (UTC)", "source", "non-Existent Users", "existing Users", "failed Attempts", "successful Logins", "successful User Logons", "account Logon Ids", "failed User Logons", "end Time UTC", "enrichment_tas_threat__reports"}, {"alert Start Time (UTC)", "source", "non-Existent Users", "existing Users", "failed Attempts", "successful Logins", "successful User Logons", "account Logon Ids", "failed User Logons", "end Time UTC", "enrichment_tas_threat__reports"}),
+    #"Extracted Values" = Table.TransformColumns(#"Expanded extendedProperties", {"confidenceReasons", each Text.Combine(List.Transform(_, Text.From)), type text}),
+    #"Expanded entities" = Table.ExpandListColumn(#"Extracted Values", "entities"),
+    #"Expanded entities1" = Table.ExpandRecordColumn(#"Expanded entities", "entities", {"$id", "type", "dnsDomain", "hostName", "azureID", "omsAgentID", "name", "address"}, {"$id", "type.1", "dnsDomain", "hostName", "azureID", "omsAgentID", "name.1", "address"}),
+    #"Renamed Columns" = Table.RenameColumns(#"Expanded entities1",{{"id", "Alert Id"}}),
+    #"Removed Columns" = Table.RemoveColumns(#"Renamed Columns",{"name", "type", "vendorName"}),
+    #"Renamed Columns1" = Table.RenameColumns(#"Removed Columns",{{"type.1", "Resource Type"}, {"$id", "Unique Alert Id"}})
+in
+    #"Renamed Columns1"
+in
+    ListSecurityCenterAlerts
+
+// Virtual Networks
+
+let ListUniqueVNETS= (SubscriptionId as text) =>
+let
+ GetPages = (Path)=>
+ let
+     Source = Json.Document(Web.Contents(Path)),
+     LL= @Source[value],
+     result = try @LL & @GetPages(Source[#"nextLink"]) otherwise @LL
+ in
+ result,
+    Fullset = GetPages(GetManagementURL(AzureKind)&"/subscriptions/"&SubscriptionId&"/providers/Microsoft.Network/virtualNetworks?api-version=2018-11-01"),
+    #"Converted to Table" = Table.FromList(Fullset, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+    #"Removed Errors" = Table.RemoveRowsWithErrors(#"Converted to Table", {"Column1"}),
+    #"Expanded Column1" = Table.ExpandRecordColumn(#"Removed Errors", "Column1", {"name", "id", "location", "properties"}, {"name", "id", "location", "properties"}),
+    #"Renamed Columns" = Table.RenameColumns(#"Expanded Column1",{{"name", "VNET Name"}, {"id", "VNET Id"}}),
+    #"Expanded properties" = Table.ExpandRecordColumn(#"Renamed Columns", "properties", {"addressSpace", "virtualNetworkPeerings", "enableDdosProtection", "enableVmProtection", "dhcpOptions"}, {"addressSpace", "virtualNetworkPeerings", "enableDdosProtection", "enableVmProtection", "dhcpOptions"}),
+    #"Expanded addressSpace" = Table.ExpandRecordColumn(#"Expanded properties", "addressSpace", {"addressPrefixes"}, {"addressPrefixes"}),
+    #"Extracted Values" = Table.TransformColumns(#"Expanded addressSpace", {"addressPrefixes", each Text.Combine(List.Transform(_, Text.From), ";"), type text}),
+    #"Expanded dhcpOptions" = Table.ExpandRecordColumn(#"Extracted Values", "dhcpOptions", {"dnsServers"}, {"dnsServers"}),
+    #"Extracted Values1" = Table.TransformColumns(#"Expanded dhcpOptions", {"dnsServers", each Text.Combine(List.Transform(_, Text.From), ";"), type text}),
+    #"Replaced Errors" = Table.ReplaceErrorValues(#"Extracted Values1", {{"dnsServers", "Azure Provided"}}),
+    #"Expanded virtualNetworkPeerings" = Table.ExpandListColumn(#"Replaced Errors", "virtualNetworkPeerings"),
+    #"Expanded virtualNetworkPeerings1" = Table.ExpandRecordColumn(#"Expanded virtualNetworkPeerings", "virtualNetworkPeerings", {"id"}, {"id"}),
+    #"Renamed Columns1" = Table.RenameColumns(#"Expanded virtualNetworkPeerings1",{{"id", "VNET Peering Id"}})
+in
+    #"Renamed Columns1"
+in
+ListUniqueVNETS
+
+// Subnets
+
+let listallsubnets = (SubscriptionId as text) =>
+let
+ GetPages = (Path)=>
+ let
+     Source = Json.Document(Web.Contents(Path)),
+     LL= @Source[value],
+     result = try @LL & @GetPages(Source[#"nextLink"]) otherwise @LL
+ in
+ result,
+    Fullset = GetPages(GetManagementURL(AzureKind)&"/subscriptions/"&SubscriptionId&"/providers/Microsoft.Network/virtualNetworks?api-version=2018-11-01"),
+    #"Converted to Table" = Table.FromList(Fullset, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+        #"Expanded Column1" = Table.ExpandRecordColumn(#"Converted to Table", "Column1", {"name", "id", "location", "properties"}, {"name", "id", "location", "properties"}),
+        #"Expanded properties" = Table.ExpandRecordColumn(#"Expanded Column1", "properties", {"subnets"}, {"subnets"}),
+        #"Expanded subnets" = Table.ExpandListColumn(#"Expanded properties", "subnets"),
+        #"Expanded subnets1" = Table.ExpandRecordColumn(#"Expanded subnets", "subnets", {"name", "id", "properties"}, {"name.1", "id.1", "properties"}),
+        #"Expanded properties1" = Table.ExpandRecordColumn(#"Expanded subnets1", "properties", {"addressPrefix", "networkSecurityGroup", "routeTable", "ipConfigurations", "delegations", "serviceEndpoints", "ipConfigurationProfiles", "serviceAssociationLinks"}, { "addressPrefix", "networkSecurityGroup", "routeTable", "ipConfigurations", "delegations", "serviceEndpoints", "ipConfigurationProfiles", "serviceAssociationLinks"}),
+        #"Expanded networkSecurityGroup" = Table.ExpandRecordColumn(#"Expanded properties1", "networkSecurityGroup", {"id"}, {"id.2"}),
+        #"Expanded routeTable" = Table.ExpandRecordColumn(#"Expanded networkSecurityGroup", "routeTable", {"id"}, {"id.3"}),
+        #"Expanded ipConfigurations" = Table.ExpandListColumn(#"Expanded routeTable", "ipConfigurations"),
+        #"Expanded ipConfigurations1" = Table.ExpandRecordColumn(#"Expanded ipConfigurations", "ipConfigurations", {"id"}, {"id.4"}),
+        #"Expanded delegations" = Table.ExpandListColumn(#"Expanded ipConfigurations1", "delegations"),
+        #"Removed Columns2" = Table.RemoveColumns(#"Expanded delegations",{"serviceEndpoints"})
+    in
+        #"Removed Columns2"
+in
+    listallsubnets
+
+// NSGs
+
+let ListPublicIPs = (subscriptionId as text) =>
+let
+    url = GetManagementURL(AzureKind)&"/subscriptions/"&subscriptionId&"/providers/Microsoft.Network/networkSecurityGroups?api-version=2018-08-01",
+    iterations = 10,
+    FuncGetOnePage = (url) as record =>
+    let 
+       Source = Json.Document(Web.Contents(url)),
+       data = try Source[value] otherwise null,
+       next = try Source[nextLink] otherwise null,
+       res = [Data=data, Next=next]
+    in
+        res,
+        GeneratedListOfPages = List.Generate(()=>[i=0, res = FuncGetOnePage(url)],
+        each [i]<iterations and [res][Data]<>null,
+        each [i=[i]+1, res = FuncGetOnePage([res][Next])],
+        each [res][Data]),
+
+    #"Converted to Table" = Table.FromList(GeneratedListOfPages, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+    #"Expanded Column1" = Table.ExpandListColumn(#"Converted to Table", "Column1")
+   
+in
+    #"Expanded Column1"
+in
+    ListPublicIPs
+
+// Disks
+
+let ListAllDisks = (subscriptionId as text) =>
+let
+    Source = Json.Document(Web.Contents(GetManagementURL(AzureKind)&"/subscriptions/"&subscriptionId&"/providers/Microsoft.Compute/disks?api-version=2019-03-01")),
+    value = Source[value],
+    #"Converted to Table" = Table.FromList(value, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+    #"Expanded Column1" = Table.ExpandRecordColumn(#"Converted to Table", "Column1", {"name", "id", "type", "location", "tags", "managedBy", "sku", "properties"}, {"name", "id", "type", "location", "tags", "managedBy", "sku", "properties"}),
+    #"Removed Columns" = Table.RemoveColumns(#"Expanded Column1",{"tags"}),
+    #"Expanded sku" = Table.ExpandRecordColumn(#"Removed Columns", "sku", {"name", "tier"}, {"name.1", "tier"}),
+    #"Expanded properties" = Table.ExpandRecordColumn(#"Expanded sku", "properties", {"osType", "creationData", "diskSizeGB", "diskIOPSReadWrite", "diskMBpsReadWrite", "timeCreated", "diskState"}, {"osType", "creationData", "diskSizeGB", "diskIOPSReadWrite", "diskMBpsReadWrite", "timeCreated", "diskState"}),
+    #"Expanded creationData" = Table.ExpandRecordColumn(#"Expanded properties", "creationData", {"createOption", "imageReference"}, {"createOption", "imageReference"}),
+    #"Expanded imageReference" = Table.ExpandRecordColumn(#"Expanded creationData", "imageReference", {"id"}, {"id.1"}),
+    #"Split Column by Delimiter" = Table.SplitColumn(#"Expanded imageReference", "id.1", Splitter.SplitTextByDelimiter("/", QuoteStyle.Csv), {"id.1.1", "id.1.2", "id.1.3", "id.1.4", "id.1.5", "id.1.6", "id.1.7", "id.1.8", "id.1.9", "id.1.10", "id.1.11", "id.1.12", "id.1.13", "id.1.14", "id.1.15", "id.1.16", "id.1.17"}),
+    #"Changed Type" = Table.TransformColumnTypes(#"Split Column by Delimiter",{{"id.1.1", type text}, {"id.1.2", type text}, {"id.1.3", type text}, {"id.1.4", type text}, {"id.1.5", type text}, {"id.1.6", type text}, {"id.1.7", type text}, {"id.1.8", type text}, {"id.1.9", type text}, {"id.1.10", type text}, {"id.1.11", type text}, {"id.1.12", type text}, {"id.1.13", type text}, {"id.1.14", type text}, {"id.1.15", type text}, {"id.1.16", type text}, {"id.1.17", type text}}),
+    #"Removed Columns1" = Table.RemoveColumns(#"Changed Type",{"id.1.1", "id.1.2", "id.1.3", "id.1.4", "id.1.5", "id.1.6", "id.1.7", "id.1.8", "id.1.10", "id.1.12", "id.1.14"}),
+    #"Renamed Columns" = Table.RenameColumns(#"Removed Columns1",{{"id.1.17", "SKU Version"}, {"id.1.15", "SKU"}, {"id.1.13", "OS Type"}, {"id.1.9", "Publisher"}, {"name", "Disk Name"}, {"id", "Resource Id"}}),
+    #"Removed Columns2" = Table.RemoveColumns(#"Renamed Columns",{"type"}),
+    #"Renamed Columns1" = Table.RenameColumns(#"Removed Columns2",{{"name.1", "Disk Type"}, {"tier", "Disk Tier"}})
+in
+    #"Renamed Columns1"
+
+in 
+    ListAllDisks
+
+// Azure Kubernetes Service Clusters
+
+let ListAKS= (subscriptionId as text) =>
+
+let
+    Source = Json.Document(Web.Contents("https://management.azure.com/subscriptions/"&subscriptionId&"/providers/Microsoft.ContainerService/managedClusters?api-version=2019-08-01")),
+    value = Source[value],
+    #"Converted to Table" = Table.FromList(value, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+    #"Expanded Column1" = Table.ExpandRecordColumn(#"Converted to Table", "Column1", {"id", "location", "name", "type", "properties"}, {"id", "location", "name", "type", "properties"}),
+    #"Expanded properties" = Table.ExpandRecordColumn(#"Expanded Column1", "properties", {"provisioningState", "kubernetesVersion", "dnsPrefix", "fqdn", "agentPoolProfiles", "servicePrincipalProfile", "addonProfiles", "nodeResourceGroup", "enableRBAC", "networkProfile"}, {"provisioningState", "kubernetesVersion", "dnsPrefix", "fqdn", "agentPoolProfiles", "servicePrincipalProfile", "addonProfiles", "nodeResourceGroup", "enableRBAC", "networkProfile"}),
+    #"Expanded agentPoolProfiles" = Table.ExpandListColumn(#"Expanded properties", "agentPoolProfiles"),
+    #"Expanded agentPoolProfiles1" = Table.ExpandRecordColumn(#"Expanded agentPoolProfiles", "agentPoolProfiles", {"name", "count", "vmSize", "storageProfile", "maxPods", "osType", "vnetSubnetID", "osDiskSizeGB"}, {"name.1", "count", "vmSize", "storageProfile", "maxPods", "osType", "vnetSubnetID", "osDiskSizeGB"}),
+    #"Expanded servicePrincipalProfile" = Table.ExpandRecordColumn(#"Expanded agentPoolProfiles1", "servicePrincipalProfile", {"clientId"}, {"servicePrincipalProfile.clientId"}),
+    #"Expanded addonProfiles" = Table.ExpandRecordColumn(#"Expanded servicePrincipalProfile", "addonProfiles", {"httpApplicationRouting", "omsagent", "httpapplicationrouting"}, {"addonProfiles.httpApplicationRouting.1", "addonProfiles.omsagent", "addonProfiles.httpapplicationrouting"}),
+    #"Expanded addonProfiles.omsagent" = Table.ExpandRecordColumn(#"Expanded addonProfiles", "addonProfiles.omsagent", {"enabled", "config"}, {"addonProfiles.omsagent.enabled", "addonProfiles.omsagent.config"}),
+    #"Expanded addonProfiles.omsagent.config" = Table.ExpandRecordColumn(#"Expanded addonProfiles.omsagent", "addonProfiles.omsagent.config", {"logAnalyticsWorkspaceResourceID", "loganalyticsworkspaceresourceid"}, {"addonProfiles.omsagent.config.logAnalyticsWorkspaceResourceID.1", "addonProfiles.omsagent.config.loganalyticsworkspaceresourceid"}),
+    #"Merged Columns" = Table.CombineColumns(#"Expanded addonProfiles.omsagent.config",{"addonProfiles.omsagent.config.logAnalyticsWorkspaceResourceID.1", "addonProfiles.omsagent.config.loganalyticsworkspaceresourceid"},Combiner.CombineTextByDelimiter("", QuoteStyle.None),"Merged"),
+    #"Renamed Columns" = Table.RenameColumns(#"Merged Columns",{{"Merged", "logAnalyticsWorkspaceResourceID"}}),
+    #"Removed Columns" = Table.RemoveColumns(#"Renamed Columns",{"addonProfiles.httpapplicationrouting", "networkProfile", "addonProfiles.httpApplicationRouting.1"})
+in
+    #"Removed Columns"
+in
+    #"ListAKS"
+
+
