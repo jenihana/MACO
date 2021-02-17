@@ -75,10 +75,6 @@ Azure Advisor is a personalized cloud consultant that helps you follow best prac
 
 The MACO Power BI Dashboard will directly pull data from Azure Advisor REST APIs to aggregate all the information across the Azure account subscriptions. This requires generating the recommendations before the first time we load the template else the Dashboard will be empty or will fail because it was unable to download any data.
 
-To do so, you need to generate the recommendations for the first time manually from the Azure Portal, or programmatically using the script [GenerateAllSubscriptionsAdvisorRecommendations.ps1](/scripts/GenerateAllSubsAdvisorRecommendations.ps1)
-
-### Generating Azure Advisor recommendations manually
-
 Open the Azure Portal with your Azure Account http://portal.azure.com 
 
 1. Click on **Advisor**.
@@ -89,27 +85,6 @@ Open the Azure Portal with your Azure Account http://portal.azure.com
 
 ![AdvisorRecommendations](/images/AdvisorRecommendations.png)
 
-## Azure Security Center Recommendations
-
-Azure Security Center provides unified security management and advanced threat protection for workloads running in Azure, on-premises, and in other clouds. It delivers visibility and control over hybrid cloud workloads, active defence that reduces your exposure to threats, and intelligent detection to help you keep pace with rapidly evolving cyber-attacks.
-
-You can find more information at the official Azure Security Center site [here](https://docs.microsoft.com/en-us/azure/security-center/security-center-intro).
-
-Azure Security Center is offered in two tiers:
-
-- Free
-- Standard
-  
-The Standard tier is offered [free for the first 60 days](https://azure.microsoft.com/en-us/pricing/details/security-center/).
-
-The following picture shows the steps to configure Azure Security Center plan for Azure Subscriptions
-
-1.	Click on **Security Center**.
-2.	Click on **Click on top to learn more**.
-3.	Click on **Select the subscription you want to configure**.
-4.	Click on **Free** or **Standard** plan and the click **Save**.
-
-![SecurityCenterStandardRecommendations](/images/EnableSecurityCenterStandard.png)
 
 # Setting up the Managed Azure Cost Optimization Power BI Dashboard
 
