@@ -100,14 +100,31 @@ In order for the initial dashboard to be stood up, two cost history reports are 
 1. Navigate to Portal.Azure.com
 2. Sign in with the relevant client's account
 3. Search and navigate to **Cost Management + Billing**
+
+    ![cost management + billing](/images/costmgmtsearch.jpg)
+
 4. On the Azure Blade, navigate to **Cost analysis**
+
+    ![azure blade](/images/blade.jpg)
+
 5. Across the top, find and update the following filter:
     - Date(s) **Last 3 months**
     - "Group by:" = **Subscription**
     - "Granularity:" = **Monthly**
     - Type = **Table**
+
+    ![datefilter](/images/datefilter.jpg)
+
+    ![subscriptionfilter](/images/subfilter.jpg)
+ 
  6. Once the above parameters are set, click **Download**
+
+    ![download](/images/download.jpg)
+ 
  7. On the subsequent menu, ensure that the type is "Excel", and click "Download Data" 
+ 
+    ![excel](/images/excel.jpg)
+ 
  8. Save the file name as **"Azure Cost History_Subscription"**
 
 Repeat steps 5-8 again with the following addendums:
@@ -121,6 +138,9 @@ Repeat steps 5-8 again with the following addendums:
     - "Group by:" = **Service name**
     - "Granularity:" = Monthly
     - Type = Table
+ 
+    ![servicefilter](/images/servicefilter.jpg)
+
 <!---
 6. __
 7. _ --->
