@@ -238,14 +238,16 @@ If the permissions and credentials are properly flushed it should ask you for cr
 
 ![loganalytics](/images/loganalyticsAPI.PNG)
 
-### Enter Access Web content credentials
+### Enter Power BI Dataflows credentials
 
-- Make sure that you select **Organization account** type.
 - Click on **Sign in**.
   
-![credentials7](/images/Credentials7.png)
+![credentials7](/images/dataflows.png)
 
+- Sign in with your organizational account associated with the MACO PowerBI workspace.
+- Press **Connect**.
 
+![credentials8](/images/connect.png)
 
 # Report Pages
 
