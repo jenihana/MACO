@@ -129,13 +129,15 @@ Repeat steps 5-8 again with the following addendums:
 You will need both files in a later step. 
 
 ## Input Parameters
+From this repository, download and open the file named "MACO_PBITemplate_vX.pbit"
 
-Upon opening the file, you will be met with the following parameters
+Upon opening the .pbit file, you will be met with the following parameters
 1. TenantName 
 2. AzureKind 
 3. Log Analytics Workspaces
 4. Subscriptions Cost History Report File Path
 5. Service Cost History File Path
+6. Optimization Tracking File Path
 
 ### TenantName
 
