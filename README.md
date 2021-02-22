@@ -111,11 +111,20 @@ In order for the initial dashboard to be stood up, two cost history reports are 
  8. Save the file name as **"Azure Cost History_Subscription"**
 
 Repeat steps 5-8 again with the following addendums:
-5. Across the top, find and update the following filter:
+<!---
+1. __
+2. __
+3. __
+4. __
+--->
+6. Across the top, find and update the following filter:
     - Date(s) Last 3 months
     - "Group by:" = **Service name**
     - "Granularity:" = Monthly
     - Type = Table
+<!---
+6. __
+7. _ --->
 8. Change the file name to **"Azure Cost History_Service Name"**
 
 You will need both files in a later step. 
