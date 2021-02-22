@@ -6,10 +6,11 @@ The Cognizant MACO Power BI Dashboard is a report that aims to aggregate and con
 
 ### Requirements
 
-- The MACO Dashboard is a Power BI Template that requires to download and install the Microsoft Power BI Desktop Edition from the Microsoft Store. Below you can find the minimum requirements to run the Dashboard
+- The MACO Dashboard is a Power BI Template that requires to download and install the Microsoft Power BI Desktop Edition from the Microsoft Store. Below you can find the minimum requirements to run the Dashboard*
     -	Windows 10 version **14393.0** or **higher**.
     -	Internet access from the computer running Microsoft Power BI desktop.
-    - An Azure account on the desired tenant space with permissions on the subscriptions to read from the Azure Services described above.
+    -   An Azure account on the desired tenant space with permissions on the subscriptions to read from the Azure Services described above.
+    *Requirements up to date as of Feb 2021
 
 Below you can find the list of providers and the actions that you will need to permit to allow to run the CCO Power BI Dashboard:
 </div>
@@ -88,11 +89,51 @@ Open the Azure Portal with your Azure Account http://portal.azure.com
 
 # Setting up the Managed Azure Cost Optimization Power BI Dashboard
 
-## Tenant Name
+## Prerequisites 
+
+### Download MACO PBI Template
+
+Download and open the latest MACO_PBITemplate_vX.pbit to your local machine. (The most up to date file should be hosted on the main folder of this repo.)
+
+### Cost History Exports from Azure
+In order for the initial dashboard to be stood up, two cost history reports are required from Azure Cost Management + Billing portal. Follow the steps below to aquire these reports: 
+1. Navigate to Portal.Azure.com
+2. Sign in with the relevant client's account
+3. Search and navigate to **Cost Management + Billing**
+4. On the Azure Blade, navigate to **Cost analysis**
+5. Across the top, find and update the following filter:
+    - Date(s) **Last 3 months**
+    - "Group by:" = **Subscription**
+    - "Granularity:" = **Monthly**
+    - Type = **Table**
+ 6. Once the above parameters are set, click **Download**
+ 7. On the subsequent menu, ensure that the type is "Excel", and click "Download Data" 
+ 8. Save the file name as **"Azure Cost History_Subscription"**
+
+Repeat steps 5-8 again with the following addendums:
+5. Across the top, find and update the following filter:
+    - Date(s) Last 3 months
+    - "Group by:" = **Service name**
+    - "Granularity:" = Monthly
+    - Type = Table
+8. Change the file name to **"Azure Cost History_Service Name"**
+
+You will need both files in a later step. 
+
+## Input Parameters
+
+Upon opening the file, you will be met with the following parameters
+1. TenantName 
+2. AzureKind 
+3. Log Analytics Workspaces
+4. Subscriptions Cost History Report File Path
+5. Service Cost History File Path
+
+### TenantName
 
 Input the name of the Azure Tenant in which the subscriptions exist in.
 
-## Environment selection
+### AzureKind
 
 Before start loading data you need to select which type of environment you're using:
 
@@ -102,15 +143,23 @@ Before start loading data you need to select which type of environment you're us
 
 ![selector](/images/inputs.png)
 
-## Log Analytics Workspace ID
+### Log Analytics Workspaces
 
 Next, determine the Log Analytics workspace(s) that the targeted virtual machines are connected to. The ID of the workspace is located in the overview page of the workspace in Azure and can simply be copy->pasted into the Power BI input.
 
-If there are multiple Log Analytics workspaces with VMs then please sepearte the workspace IDs with a semi-colon ';'.
+If there are multiple Log Analytics workspaces with VMs then please sepearte the workspace IDs with a semi-colon ';' (no space).
 
-## Subscriptions Cost History Report
+EX: 59483733-898d-4b5e-8cf4-514d047b3rec;59304833-888d-4p6g-8cf4-511446b3efv
+
+### Subscriptions Cost History Report File Path (See instructions in prerequisites)
 
 In Azure cost management the user must download a 3 month cost history report by subscription and service name and then download it to excel. Then the user needs to copy the file path of the two exports into the Power BI inputs.
+
+### Service Cost History File Path (See instructions in prerequisites)
+
+## Click "Load"
+
+****
 
 ## Modify Privacy settings
 
