@@ -115,9 +115,8 @@ Repeat steps 5-8 again with the following addendums:
 1. __
 2. __
 3. __
-4. __
---->
-6. Across the top, find and update the following filter:
+4. __ --->
+5. Across the top, find and update the following filter:
     - Date(s) Last 3 months
     - "Group by:" = **Service name**
     - "Granularity:" = Monthly
