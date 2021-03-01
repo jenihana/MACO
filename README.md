@@ -33,6 +33,7 @@ The MACO Dashboard pulls information from several APIs. You can read the public 
 | [Azure Security Center Alerts](https://msdn.microsoft.com/en/US/library/mt704034(Azure.100).aspx)  |2019-01-01 |2019-01-01|:heavy_check_mark:|
 | [Azure Kubernetes Service](https://docs.microsoft.com/en-us/rest/api/aks) | 2019-08-01|2019-08-01|:heavy_check_mark:|
 | [Azure Compute](https://docs.microsoft.com/en-us/rest/api/compute) | 2019-03-01|2019-03-01|:heavy_check_mark:|
+| [Azure SQL Database](https://docs.microsoft.com/en-us/rest/api/sql/) | 2020-08-01-preview|2020-08-01-preview|:heavy_check_mark:|)
 | [Azure Disks](https://docs.microsoft.com/en-us/rest/api/compute/disks/list) | 2019-03-01|2019-03-01|:heavy_check_mark:|
 | [Azure Virtual Networks](https://docs.microsoft.com/en-us/rest/api/virtual-network) | 2019-04-01|2019-04-01|:heavy_check_mark:|
 | [Azure Network Interfaces](https://docs.microsoft.com/en-us/rest/api/virtualnetwork/networkinterfaces) |2019-04-01 |2019-04-01|:heavy_check_mark:|
