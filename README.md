@@ -258,6 +258,12 @@ In this page, you will be able to identify the previous month total Azure spend 
 
 ![overview](/images/Overview.png)
 
+## Cost Optimization Tracking page
+
+In this page, you will be able to track cost savings throughout the life cycle of the engagement. Savings are categorized by resource name, type, subscription, and type of optimization that was completed. As the engagement progresses, it will also show how resource utilization as resources are rightsized.
+
+![SavingsTracker](/images/optimizationTracking.png)
+
 ## Azure Compute Overview page
 
 In this tab, you will be able to identify the number of VMs, the Operating System, SKU, Availability Set name, location, SKU, the VNET and subnet each VM is connected, the private IP address and if the VM has any extension installed.
@@ -290,6 +296,24 @@ Data Inputs
 - https://azure.microsoft.com/en-us/pricing/details/sql-database/single/
 
 ![sqlDB](/images/sqlOverview.png)
+
+## Azure Hybrid Benefit Opportunities page
+
+In this tab, you can see any and all Virtual Machines that are eligible to use Azure Hybrid Benefit and what the corresponding savings would be. Azure Hybrid Benefit is a licensing benefit that helps you to significantly reduce the costs of running your workloads in the cloud. It works by letting you use your on-premises Software Assurance-enabled Windows Server and SQL Server licenses on Azure.
+
+You can filter the information by:
+
+- Tenant
+- Subscription
+- Resource Group
+- Vm extension
+
+Data Inputs
+- https://docs.microsoft.com/en-us/rest/api/compute
+- http://azure.microsoft.com/api/v2/pricing/virtual-machines-base/calculator/
+- https://azure.microsoft.com/en-us/pricing/hybrid-benefit/
+
+![azurecompute](/images/ahub.png)
 
 ## Azure Virtual Machine Rightsizing page
 
