@@ -259,7 +259,7 @@ In this page, you will be able to identify the previous month total Azure spend 
 
 ## Azure Compute Overview page
 
-In this tab, you will be able to identify the number of VMs, the Operating System, the SKU, the Availability Set name, the location, the VM Size, the VNET and subnet each VM is connected, the private IP address and if the VM has any extension installed.
+In this tab, you will be able to identify the number of VMs, the Operating System, SKU, Availability Set name, location, SKU, the VNET and subnet each VM is connected, the private IP address and if the VM has any extension installed.
 
 You can filter the information by:
 
@@ -273,6 +273,22 @@ Data Inputs
 - http://azure.microsoft.com/api/v2/pricing/virtual-machines-base/calculator/
 
 ![azurecompute](/images/Compute.png)
+
+## Azure SQL Database Overview page
+
+In this tab, you will be able to identify the number of Databases, Subscription/Resource Group, connected server, database size, storage replication type, and subscription option of the database. This table also features the current monthly cost of each database along with potential AHUB and Reserved SQL Capacity savings on an annual and three year basis. 
+
+You can filter the information by:
+
+- Subscription
+- Server Name
+- Database Tier
+
+Data Inputs
+- https://docs.microsoft.com/en-us/rest/api/sqlDatabases
+- https://azure.microsoft.com/en-us/pricing/details/sql-database/single/
+
+![sqlDB](/images/sqlOverview.png)
 
 ## Azure Virtual Machine Rightsizing page
 
