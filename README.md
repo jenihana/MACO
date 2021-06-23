@@ -123,7 +123,7 @@ In order for the initial dashboard to be stood up, two cost history reports are 
  
     ![excel](/images/excel.jpg)
  
- 8. Save the file name as **"Azure Cost History_Subscription.xlxs"**
+ 8. Save the file name as **"Azure Cost History.xlxs"**
 
 You will need this file in a later step. 
 
