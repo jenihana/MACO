@@ -106,14 +106,14 @@ In order for the initial dashboard to be stood up, two cost history reports are 
     ![azure blade](/images/blade.jpg)
 
 5. Across the top, find and update the following filter:
-    - Date(s) **Last 3 months**
-    - "Group by:" = **Subscription**
-    - "Granularity:" = **Monthly**
+    - View: **Daily costs**
+    - Date(s) **Last Months**
+    - "Group by:" = **Resource Name**
+    - "Granularity:" = **Daily**
     - Type = **Table**
 
-    ![datefilter](/images/datefilter.jpg)
+    ![CostMgmt](/images/CostMgmt.png)
 
-    ![subscriptionfilter](/images/subfilter.jpg)
  
  6. Once the above parameters are set, click **Download**
 
@@ -123,28 +123,9 @@ In order for the initial dashboard to be stood up, two cost history reports are 
  
     ![excel](/images/excel.jpg)
  
- 8. Save the file name as **"Azure Cost History_Subscription"**
+ 8. Save the file name as **"Azure Cost History_Subscription.xlxs"**
 
-Repeat steps 5-8 again with the following addendums:
-<!---
-1. __
-2. __
-3. __
-4. __ --->
-5. Across the top, find and update the following filter:
-    - Date(s) Last 3 months
-    - "Group by:" = **Service name**
-    - "Granularity:" = Monthly
-    - Type = Table
- 
-    ![servicefilter](/images/servicefilter.jpg)
-
-<!---
-6. __
-7. _ --->
-8. Change the file name to **"Azure Cost History_Service Name"**
-
-You will need both files in a later step. 
+You will need this file in a later step. 
 
 ## Input Parameters
 From this repository, download and open the file named "MACO_PBITemplate_vX.pbit"
@@ -154,7 +135,6 @@ Upon opening the .pbit file, you will be met with the following parameters
 2. AzureKind 
 3. Log Analytics Workspaces
 4. Subscriptions Cost History Report File Path
-5. Service Cost History File Path
 6. Optimization Tracking File Path
 
 ### TenantName
@@ -181,9 +161,12 @@ EX: 59483733-898d-4b5e-8cf4-514d047b3rec;59304833-888d-4p6g-8cf4-511446b3efv
 
 ### Subscriptions Cost History Report File Path (See instructions in prerequisites)
 
-In Azure cost management the user must download a 3 month cost history report by subscription and service name and then download it to excel. Then the user needs to copy the file path of the two exports into the Power BI inputs.
+In Azure cost management the user must download a daily cost history report by resource name and then download it to excel. Then the user needs to copy the file path of the export into the Power BI parameter
 
-### Service Cost History File Path (See instructions in prerequisites)
+### Optimization Tracking File Path
+
+See: 'Optimization Tracking Template.xlxs' in repo files
+ 
 
 ## Click "Load"
 
