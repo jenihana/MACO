@@ -101,11 +101,12 @@ In order for the initial dashboard to be stood up, two cost history reports are 
 
     ![cost management + billing](/images/costmgmtsearch.jpg)
 
-4. On the Azure Blade, navigate to **Cost analysis**
-
+4. On the Azure Blade, click on **Cost Management**
+5. On the Azure Blade, click on **Cost analysis**  
+    
     ![azure blade](/images/blade.jpg)
 
-5. Across the top, find and update the following filter:
+6. Across the top, find and update the following filter:
     - View: **Daily costs**
     - Date(s) **Last Months**
     - "Group by:" = **Resource Name**
@@ -115,11 +116,11 @@ In order for the initial dashboard to be stood up, two cost history reports are 
     ![CostMgmt](/images/CostMgmt.png)
 
  
- 6. Once the above parameters are set, click **Download**
+ 7. Once the above parameters are set, click **Download**
 
     ![download](/images/download.jpg)
  
- 7. On the subsequent menu, ensure that the type is "Excel", and click "Download Data" 
+ 8. On the subsequent menu, ensure that the type is "Excel", and click "Download Data" 
  
     ![excel](/images/excel.jpg)
  
