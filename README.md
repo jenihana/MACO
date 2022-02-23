@@ -101,8 +101,9 @@ In order for the initial dashboard to be stood up, two cost history reports are 
 
     ![cost management + billing](/images/costmgmtsearch.jpg)
 
-4. On the Azure Blade, navigate to **Cost analysis**
-
+4. On the Azure Blade, click on **Cost Management**
+5. On the Azure Blade, click on **Cost analysis**  
+    
     ![azure blade](/images/blade.jpg)
 
 5. Across the top, find and update the following filter:
